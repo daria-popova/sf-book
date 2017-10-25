@@ -40,13 +40,13 @@ class Book
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\File(mimeTypes={ "image/jpeg" })
+     * @Assert\File(mimeTypes={ "image/jpeg", "image/png" })
      */
     private $cover;
 
     /**
      * @ORM\Column(type="string", nullable=true)
-     * @Assert\File(mimeTypes={ "application/pdf" })
+     * @Assert\File(maxSize="5M")
      */
     private $source;
 

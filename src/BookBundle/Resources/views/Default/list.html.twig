@@ -1,23 +1,28 @@
-hello there
+<h1>project.name</h1>
+
 {% if is_granted('ROLE_USER') %}
-    <a href="{{ path("create") }}">Добавить</a>
+    <a href="{{ path("create") }}">Add</a>
 {% endif %}
 
 {% for book in books %}
     <p>
         {{ book.author }}. {{ book.title }}
         {% if book.isDownloadAllowed and book.source %}
-            <a href="{{ book.source }}" target="_blank">Скачать</a>
+            <a href="{{ upload }}/{{ book.source }}" target="_blank">Download</a>
         {% endif %}
 
         {% if is_granted('ROLE_USER') %}
-            <a href="{{ path("edit", {"id": book.id}) }}">Редактировать</a>
+            <a href="{{ path("edit", {"id": book.id}) }}">Edit</a>
+        {% endif %}
+
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path("delete", {"id": book.id}) }}">Delete</a>
         {% endif %}
     </p>
     {% if book.cover %}
-        <img src="/upload/{{ book.cover }}">
+        <img src="{{ upload }}/{{ book.cover }}">
     {% else %}
-        <img src="/upload/default.gif">
+        <img src="{{ upload }}/{{ default_img }}">
     {% endif %}
     <hr>
 {% endfor %}

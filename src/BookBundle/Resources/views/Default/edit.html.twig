@@ -1,3 +1,27 @@
 {{ form_start(form) }}
-{{ form_widget(form) }}
+
+{{ form_row(form.title) }}
+<hr>
+{{ form_row(form.author) }}
+<hr>
+{{ form_row(form.readDate) }}
+<hr>
+{{ form_row(form.isDownloadAllowed) }}
+<hr>
+{% if oldFilePath.cover %}
+    <img src="{{ upload }}/{{ oldFilePath.cover }}">
+    {% if form.deleteCover %}
+        {{ form_row(form.deleteCover) }}
+    {% endif %}
+{% endif %}
+{{ form_row(form.cover) }}
+<hr>
+{% if oldFilePath.source %}
+    <a href="{{ upload }}/{{ oldFilePath.source }}"> Link </a>
+    {% if form.deleteSource %}
+        {{ form_row(form.deleteSource) }}
+    {% endif %}
+{% endif %}
+{{ form_row(form.source) }}
+<hr>
 {{ form_end(form) }}

@@ -1,8 +1,11 @@
 parameters:
-  upload_directory: '%kernel.project_dir%/web/upload'
-  default_cover: '%kernel.project_dir%/%upload_directory%/default.gif'
+  upload_directory: '/upload'
 
 services:
   BookBundle\Service\FileUploader:
     arguments:
-      $uploadDir: '%upload_directory%'
+      $uploadDir: '%kernel.project_dir%/web%upload_directory%'
+twig:
+  globals:
+    upload: '%upload_directory%'
+    default_img: 'default.gif'
