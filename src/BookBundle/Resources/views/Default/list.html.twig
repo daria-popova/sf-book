@@ -1,28 +1,30 @@
-<h1>project.name</h1>
+{{ include('@Book/Default/header.html.twig') }}
+    <h1>project.name</h1>
 
-{% if is_granted('ROLE_USER') %}
-    <a href="{{ path("create") }}">Add</a>
-{% endif %}
-
-{% for book in books %}
-    <p>
-        {{ book.author }}. {{ book.title }}
-        {% if book.isDownloadAllowed and book.source %}
-            <a href="{{ upload }}/{{ book.source }}" target="_blank">Download</a>
-        {% endif %}
-
-        {% if is_granted('ROLE_USER') %}
-            <a href="{{ path("edit", {"id": book.id}) }}">Edit</a>
-        {% endif %}
-
-        {% if is_granted('ROLE_USER') %}
-            <a href="{{ path("delete", {"id": book.id}) }}">Delete</a>
-        {% endif %}
-    </p>
-    {% if book.cover %}
-        <img src="{{ upload }}/{{ book.cover }}">
-    {% else %}
-        <img src="{{ upload }}/{{ default_img }}">
+    {% if is_granted('ROLE_USER') %}
+        <a href="{{ path("create") }}">Add</a>
     {% endif %}
-    <hr>
-{% endfor %}
+
+    {% for book in books %}
+        <p>
+            {{ book.author }}. {{ book.title }}
+            {% if book.isDownloadAllowed and book.source %}
+                <a href="{{ upload }}/{{ book.source }}" target="_blank">Download</a>
+            {% endif %}
+
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path("edit", {"id": book.id}) }}">Edit</a>
+            {% endif %}
+
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path("delete", {"id": book.id}) }}">Delete</a>
+            {% endif %}
+        </p>
+        {% if book.cover %}
+            {{ book.cover|resize_image(200, 300) }}
+        {% else %}
+            {{ default_img|resize_image }}
+        {% endif %}
+        <hr>
+    {% endfor %}
+{{ include('@Book/Default/footer.html.twig') }}

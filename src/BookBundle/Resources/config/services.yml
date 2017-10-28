@@ -1,10 +1,17 @@
 parameters:
   upload_directory: '/upload'
+  default_img_width: 200
+  default_img_height: 200
 
 services:
   BookBundle\Service\FileUploader:
     arguments:
       $uploadDir: '%kernel.project_dir%/web%upload_directory%'
+  BookBundle\EventListener\DeleteUnusedFilesSubscriber:
+    arguments:
+      $uploadDir: '%kernel.project_dir%/web%upload_directory%'
+    tags:
+      - { name: doctrine.event_subscriber, connection: default }
 twig:
   globals:
     upload: '%upload_directory%'

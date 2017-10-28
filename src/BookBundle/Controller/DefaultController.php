@@ -64,11 +64,21 @@ class DefaultController extends Controller
         ];
 
         if ($book->getCover()) {
-            $book->setCover(new File($fileUploader->getUploadDir() . '/' . $book->getCover()));
+            $fullCoverPath = $fileUploader->getUploadDir() . '/' . $book->getCover();
+            if (is_file($fullCoverPath)) {
+                $book->setCover(new File($fullCoverPath, true));
+            } else {
+                $book->setCover(null);
+            }
         }
 
         if ($book->getSource()) {
-            $book->setSource(new File($fileUploader->getUploadDir() . '/' . $book->getSource()));
+            $fullSourcePath = $fileUploader->getUploadDir() . '/' . $book->getSource();
+            if (is_file($fullSourcePath)) {
+                $book->setSource(new File($fullSourcePath, true));
+            } else {
+                $book->setSource(null);
+            }
         }
 
         $form = $this->createForm(BookType::class, $book);
@@ -92,7 +102,7 @@ class DefaultController extends Controller
             if ($book->getSource() instanceof UploadedFile) {
                 $book->setSource($fileUploader->upload($book->getSource()));
             } elseif ($deleteSource) {
-                $book->setCover(null);
+                $book->setSource(null);
             } else {
                 $book->setSource($oldFilePath['source']);
             }
@@ -102,8 +112,10 @@ class DefaultController extends Controller
             return $this->redirectToRoute('list');
         }
 
-        return $this->render('BookBundle:Default:edit.html.twig',
-            ['form' => $form->createView(), 'oldFilePath' => $oldFilePath]);
+        return $this->render(
+            'BookBundle:Default:edit.html.twig',
+            ['form' => $form->createView(), 'oldFilePath' => $oldFilePath]
+        );
     }
 
     /**
