@@ -20,21 +20,25 @@ class Book
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message = "Field 'title' must be a non-empty string")
      */
     private $title;
 
     /**
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message = "Field 'author' must be a non-empty string")
      */
     private $author;
 
     /**
      * @ORM\Column(type="date")
+     * @Assert\NotBlank(message = "Field 'readDate' must be a valid date. Format '2001-12-30'")
      */
     private $readDate;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Assert\NotNull(message = "Field 'isDownloadAllowed' must be a boolean value")
      */
     private $isDownloadAllowed;
 

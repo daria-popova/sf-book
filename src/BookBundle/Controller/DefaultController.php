@@ -48,7 +48,7 @@ class DefaultController extends Controller
         return $this->createOrEditAction($id, $request, $fileUploader);
     }
 
-    public function createOrEditAction($id, Request $request, FileUploader $fileUploader)
+    private function createOrEditAction($id, Request $request, FileUploader $fileUploader)
     {
         $em = $this->getDoctrine()->getManager();
 
