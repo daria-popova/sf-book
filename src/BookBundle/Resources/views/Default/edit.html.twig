@@ -1,4 +1,11 @@
 {{ include('@Book/Default/header.html.twig') }}
+    <h1>
+        {% if new %}
+            {{ 'form.title.add'|trans }}
+        {% else %}
+            {{ 'form.title.edit'|trans }}
+        {% endif %}
+    </h1>
     {{ form_start(form) }}
 
     {{ form_row(form.title) }}
@@ -18,7 +25,7 @@
     {{ form_row(form.cover) }}
     <hr>
     {% if oldFilePath.source %}
-        <a href="{{ upload }}/{{ oldFilePath.source }}"> Link </a>
+        <a href="{{ upload }}/{{ oldFilePath.source }}"> {{ 'book.source.link'|trans }} </a>
         {% if form.deleteSource is defined %}
             {{ form_row(form.deleteSource) }}
         {% endif %}

@@ -1,0 +1,17 @@
+project.name: Personal library
+book.add.link: Add book
+book.download.link: Download book
+book.edit.link: Edit
+book.delete.link: Delete
+book.source.link: Source link
+form.title: Title
+form.author: Author
+form.readDate: Date of reading
+form.isDownloadAllowed: Allow download
+form.cover: Cover file
+form.source: Source file
+form.save: Save
+form.deleteCover: Delete cover
+form.deleteSource: Delete source
+form.title.add: Add new book
+form.title.edit: Edit book

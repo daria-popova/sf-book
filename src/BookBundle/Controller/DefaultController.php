@@ -22,11 +22,16 @@ class DefaultController extends Controller
      */
     public function listAction()
     {
+        $cacheTime = $this->container->getParameter('default_cache_time');
         $repository = $this->getDoctrine()->getRepository(Book::class);
 
         $query = $repository->createQueryBuilder('b')
             ->orderBy('b.readDate', 'DESC')
-            ->getQuery();
+            ->getQuery()
+            ->useQueryCache(true)
+            ->useResultCache(true)
+            ->setResultCacheLifetime($cacheTime)
+            ->setResultCacheId('list_desc');
 
         $books = $query->getResult();
         return $this->render('BookBundle:Default:list.html.twig', ['books' => $books]);
@@ -56,6 +61,9 @@ class DefaultController extends Controller
             $book = new Book();
         } else {
             $book = $em->find(Book::class, $id);
+            if (!$book) {
+                return $this->render('BookBundle:Default:404.html.twig');
+            }
         }
 
         $oldFilePath = [
@@ -114,7 +122,11 @@ class DefaultController extends Controller
 
         return $this->render(
             'BookBundle:Default:edit.html.twig',
-            ['form' => $form->createView(), 'oldFilePath' => $oldFilePath]
+            [
+                'form' => $form->createView(),
+                'oldFilePath' => $oldFilePath,
+                'new' => !($book->getId())
+            ]
         );
     }
 

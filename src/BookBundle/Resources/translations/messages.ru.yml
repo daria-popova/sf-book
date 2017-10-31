@@ -1,0 +1,17 @@
+project.name: Личная библиотека книг
+book.add.link: Добавить книгу
+book.download.link: Скачать
+book.edit.link: Редактировать
+book.delete.link: Удалить
+book.source.link: Ссылка на книгу
+form.title: Название
+form.author: Автор
+form.readDate: Дата прочтения
+form.isDownloadAllowed: Разрешить скачивание
+form.cover: Обложка
+form.source: Файл с книгой
+form.save: Сохранить
+form.deleteCover: Удалить обложку
+form.deleteSource: Удалить файл с книгой
+form.title.add: Добавление книги
+form.title.edit: Редактирование книги

@@ -38,7 +38,6 @@ class Book
 
     /**
      * @ORM\Column(type="boolean")
-     * @Assert\NotNull(message = "Field 'isDownloadAllowed' must be a boolean value")
      */
     private $isDownloadAllowed;
 

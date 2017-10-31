@@ -2,6 +2,7 @@ parameters:
   upload_directory: '/upload'
   default_img_width: 200
   default_img_height: 200
+  default_cache_time: 86400
   api_key: f3abfd8063e82d244f9315ec7daa2737
 
 services:

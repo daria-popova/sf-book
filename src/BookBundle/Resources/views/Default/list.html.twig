@@ -1,23 +1,23 @@
 {{ include('@Book/Default/header.html.twig') }}
-    <h1>project.name</h1>
+    <h1>{{ 'project.name'|trans }}</h1>
 
     {% if is_granted('ROLE_USER') %}
-        <a href="{{ path("create") }}">Add</a>
+        <a href="{{ path("create") }}">{{ 'book.add.link'|trans }}</a>
     {% endif %}
 
     {% for book in books %}
         <p>
             {{ book.author }}. {{ book.title }}
             {% if book.isDownloadAllowed and book.source %}
-                <a href="{{ upload }}/{{ book.source }}" target="_blank">Download</a>
+                <a href="{{ upload }}/{{ book.source }}" target="_blank">{{ 'book.download.link'|trans }}</a>
             {% endif %}
 
             {% if is_granted('ROLE_USER') %}
-                <a href="{{ path("edit", {"id": book.id}) }}">Edit</a>
+                <a href="{{ path("edit", {"id": book.id}) }}">{{ 'book.edit.link'|trans }}</a>
             {% endif %}
 
             {% if is_granted('ROLE_USER') %}
-                <a href="{{ path("delete", {"id": book.id}) }}">Delete</a>
+                <a href="{{ path("delete", {"id": book.id}) }}">{{ 'book.delete.link'|trans }}</a>
             {% endif %}
         </p>
         {% if book.cover %}

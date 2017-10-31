@@ -3,6 +3,8 @@
 namespace Tests\BookBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Doctrine\ORM\EntityManagerInterface;
+use BookBundle\Entity\Book;
 
 class ApiControllerTest extends WebTestCase
 {
@@ -107,5 +109,14 @@ class ApiControllerTest extends WebTestCase
         $client->request('GET', '/api/v1/books?apiKey=' . $this->correctApiKey);
         $this->assertContains($fields['title'], $client->getResponse()->getContent());
         $this->assertNotContains($oldTitle, $client->getResponse()->getContent());
+
+
+        $kernel = self::bootKernel();
+        $em = $kernel->getContainer()->get('doctrine')->getManager();
+        $book = $em->find(Book::class, $id);
+        if ($book) {
+            $result = $em->remove($book);
+            $em->flush();
+        }
     }
 }
