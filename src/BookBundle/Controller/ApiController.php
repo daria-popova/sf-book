@@ -31,7 +31,6 @@ class ApiController extends Controller
         $query = $repository->createQueryBuilder('b')
             ->orderBy('b.readDate', 'DESC')
             ->getQuery()
-            ->useQueryCache(true)
             ->useResultCache(true)
             ->setResultCacheLifetime($cacheTime)
             ->setResultCacheId('list_desc');

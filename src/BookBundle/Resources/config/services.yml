@@ -4,6 +4,7 @@ parameters:
   default_img_height: 200
   default_cache_time: 86400
   api_key: f3abfd8063e82d244f9315ec7daa2737
+  cache_keys_to_clear: [list_desc]
 
 services:
   BookBundle\Service\FileUploader:
@@ -12,6 +13,11 @@ services:
   BookBundle\EventListener\DeleteUnusedFilesSubscriber:
     arguments:
       $uploadDir: '%kernel.project_dir%/web%upload_directory%'
+    tags:
+      - { name: doctrine.event_subscriber, connection: default }
+  BookBundle\EventListener\ClearCacheSubscriber:
+    arguments:
+      $cacheKeys: '%cache_keys_to_clear%'
     tags:
       - { name: doctrine.event_subscriber, connection: default }
 twig:
