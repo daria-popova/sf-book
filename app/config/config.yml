@@ -62,9 +62,8 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore
         auto_mapping: true
         result_cache_driver:
-            type: memcached
+            type: redis
             host: localhost
-            port: 11211
         second_level_cache:
             enabled: true
             log_enabled: true

@@ -1,4 +1,5 @@
-{{ include('@Book/Default/header.html.twig') }}
+{% extends '@Book/base.html.twig' %}
+{% block body %}
     <h1>
         {% if new %}
             {{ 'form.title.add'|trans }}
@@ -33,4 +34,4 @@
     {{ form_row(form.source) }}
     <hr>
     {{ form_end(form) }}
-{{ include('@Book/Default/footer.html.twig') }}
+{% endblock %}

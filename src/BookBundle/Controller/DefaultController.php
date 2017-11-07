@@ -22,22 +22,15 @@ class DefaultController extends Controller
      */
     public function listAction()
     {
-        $cacheTime = $this->container->getParameter('default_cache_time');
-        $repository = $this->getDoctrine()->getRepository(Book::class);
-
-        $query = $repository->createQueryBuilder('b')
-            ->orderBy('b.readDate', 'DESC')
-            ->getQuery()
-            ->useResultCache(true)
-            ->setResultCacheLifetime($cacheTime)
-            ->setResultCacheId('list_desc');
-
-        $books = $query->getResult();
+        $books = $this
+            ->getDoctrine()
+            ->getRepository(Book::class)
+            ->findAllOrderedByDateDesc();
         return $this->render('BookBundle:Default:list.html.twig', ['books' => $books]);
     }
 
     /**
-     * @Route("/create/", name="create")
+     * @Route("/book/create/", name="create")
      */
     public function createAction(Request $request, FileUploader $fileUploader)
     {
@@ -45,7 +38,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/edit/{id}", name="edit", requirements={"id": "\d+"})
+     * @Route("/book/edit/{id}", name="edit", requirements={"id": "\d+"})
      */
     public function editAction($id, Request $request, FileUploader $fileUploader)
     {
@@ -130,7 +123,7 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/delete/{id}", name="delete", requirements={"id": "\d+"})
+     * @Route("/book/delete/{id}", name="delete", requirements={"id": "\d+"})
      */
     public function deleteAction($id)
     {

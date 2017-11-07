@@ -25,17 +25,10 @@ class ApiController extends Controller
             return $this->jsonResponse('error', $apiKeyErrors, 403);
         }
 
-        $cacheTime = $this->container->getParameter('default_cache_time');
-        $repository = $this->getDoctrine()->getRepository(Book::class);
-
-        $query = $repository->createQueryBuilder('b')
-            ->orderBy('b.readDate', 'DESC')
-            ->getQuery()
-            ->useResultCache(true)
-            ->setResultCacheLifetime($cacheTime)
-            ->setResultCacheId('list_desc');
-
-        $books = $query->getResult();
+        $books = $this
+            ->getDoctrine()
+            ->getRepository(Book::class)
+            ->findAllOrderedByDateDesc();
 
         foreach ($books as $book) {
             if ($book->getCover()) {

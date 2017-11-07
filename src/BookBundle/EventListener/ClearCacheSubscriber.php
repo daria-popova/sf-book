@@ -31,5 +31,4 @@ class ClearCacheSubscriber implements EventSubscriber
                 ->delete($key);
         }
     }
-
 }

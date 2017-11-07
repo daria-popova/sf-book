@@ -1,4 +1,8 @@
-{{ include('@Book/Default/header.html.twig') }}
+{% extends '@Book/base.html.twig' %}
+{% block title %}
+    {{ 'project.name'|trans }}
+{% endblock %}
+{% block body %}
     <h1>{{ 'project.name'|trans }}</h1>
 
     {% if is_granted('ROLE_USER') %}
@@ -27,4 +31,4 @@
         {% endif %}
         <hr>
     {% endfor %}
-{{ include('@Book/Default/footer.html.twig') }}
+{% endblock %}

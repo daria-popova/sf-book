@@ -18,6 +18,6 @@ security:
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/create/, role: ROLE_USER }
-        - { path: ^/edit/, role: ROLE_USER }
-        - { path: ^/delete/, role: ROLE_USER }
+        - { path: ^/book/create/, role: ROLE_USER }
+        - { path: ^/book/edit/, role: ROLE_USER }
+        - { path: ^/book/delete/, role: ROLE_USER }
