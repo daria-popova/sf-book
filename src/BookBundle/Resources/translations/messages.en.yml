@@ -3,6 +3,7 @@ book.add.link: Add book
 book.download.link: Download book
 book.edit.link: Edit
 book.delete.link: Delete
+delete.book.error.message: An error occured
 book.source.link: Source link
 form.title: Title
 form.author: Author

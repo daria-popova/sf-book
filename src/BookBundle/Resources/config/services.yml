@@ -1,17 +1,14 @@
 parameters:
-  upload_directory: '/upload'
-  default_img_width: 200
-  default_img_height: 200
-  api_key: f3abfd8063e82d244f9315ec7daa2737
+  api_token: f3abfd8063e82d244f9315ec7daa2737
   cache_keys_to_clear: [book_list_desc]
 
 services:
   BookBundle\Service\FileUploader:
     arguments:
-      $uploadDir: '%kernel.project_dir%/web%upload_directory%'
+      $uploadDir: '%kernel.project_dir%/web%upload_dir%'
   BookBundle\EventListener\DeleteUnusedFilesSubscriber:
     arguments:
-      $uploadDir: '%kernel.project_dir%/web%upload_directory%'
+      $uploadDir: '%kernel.project_dir%/web%upload_dir%'
     tags:
       - { name: doctrine.event_subscriber, connection: default }
   BookBundle\EventListener\ClearCacheSubscriber:
@@ -19,7 +16,11 @@ services:
       $cacheKeys: '%cache_keys_to_clear%'
     tags:
       - { name: doctrine.event_subscriber, connection: default }
-twig:
-  globals:
-    upload: '%upload_directory%'
-    default_img: 'default.gif'
+  BookBundle\EventListener\CheckTokenSubscriber:
+    arguments:
+      $token: '%api_token%'
+    tags:
+      - { name: kernel.event_subscriber }
+  BookBundle\EventListener\ApiRequestFormatSubscriber:
+    tags:
+      - { name: kernel.event_subscriber }

@@ -1,4 +1,4 @@
-{% extends '@Book/base.html.twig' %}
+{% extends 'base.html.twig' %}
 {% block body %}
     <h1>
         {% if new %}
@@ -17,21 +17,21 @@
     <hr>
     {{ form_row(form.isDownloadAllowed) }}
     <hr>
-    {% if oldFilePath.cover %}
-        <img src="{{ upload }}/{{ oldFilePath.cover }}">
+    {% if form.vars.value.cover %}
+        <img src="{{ upload_dir ~ form.vars.value.cover }}">
         {% if form.deleteCover is defined %}
             {{ form_row(form.deleteCover) }}
         {% endif %}
     {% endif %}
-    {{ form_row(form.cover) }}
+    {{ form_row(form.coverFile) }}
     <hr>
-    {% if oldFilePath.source %}
-        <a href="{{ upload }}/{{ oldFilePath.source }}"> {{ 'book.source.link'|trans }} </a>
+    {% if form.vars.value.source %}
+        <a href="{{ upload_dir ~ form.vars.value.source }}"> {{ 'book.source.link'|trans }} </a>
         {% if form.deleteSource is defined %}
             {{ form_row(form.deleteSource) }}
         {% endif %}
     {% endif %}
-    {{ form_row(form.source) }}
+    {{ form_row(form.sourceFile) }}
     <hr>
     {{ form_end(form) }}
 {% endblock %}

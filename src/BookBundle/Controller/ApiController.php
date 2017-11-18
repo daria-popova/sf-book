@@ -2,16 +2,18 @@
 
 namespace BookBundle\Controller;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Validator\Constraints\Date;
 use Doctrine\ORM\EntityManagerInterface;
 use BookBundle\Entity\Book;
 
-class ApiController extends Controller
+class ApiController extends Controller implements TokenAuthenticatedController
 {
     /**
      * @Route("/api/v1/books", name="api_list")
@@ -20,10 +22,6 @@ class ApiController extends Controller
     public function listController(Request $request)
     {
         $serializer = $this->container->get('jms_serializer');
-        $apiKeyErrors = $this->checkApiKeyErrors($request);
-        if (!empty($apiKeyErrors)) {
-            return $this->jsonResponse('error', $apiKeyErrors, 403);
-        }
 
         $books = $this
             ->getDoctrine()
@@ -31,21 +29,13 @@ class ApiController extends Controller
             ->findAllOrderedByDateDesc();
 
         foreach ($books as $book) {
-            if ($book->getCover()) {
-                $book->setCover(
-                    $request->getScheme() . '://' .
-                    $request->getHost() .
-                    $this->container->getParameter('upload_directory') . '/' .
-                    $book->getCover()
-                );
-            }
+            $book->setCover(
+                $this->getFileWebPath($book->getCover(), $request)
+            );
 
-            if ($book->getSource() && $book->getIsDownloadAllowed()) {
+            if ($book->getIsDownloadAllowed()) {
                 $book->setSource(
-                    $request->getScheme() . '://' .
-                    $request->getHost() .
-                    $this->container->getParameter('upload_directory') . '/' .
-                    $book->getSource()
+                    $this->getFileWebPath($book->getSource(), $request)
                 );
             } else {
                 $book->setSource(null);
@@ -54,7 +44,7 @@ class ApiController extends Controller
 
         $jsonContent = $serializer->serialize($books, 'json');
 
-        return new Response($jsonContent, 200, ['Content-Type' => 'application/json']);
+        return JsonResponse::fromJsonString($jsonContent, 200);
     }
 
     /**
@@ -63,11 +53,6 @@ class ApiController extends Controller
      */
     public function createController(Request $request)
     {
-        $apiKeyErrors = $this->checkApiKeyErrors($request);
-        if (!empty($apiKeyErrors)) {
-            return $this->jsonResponse('error', $apiKeyErrors, 403);
-        }
-
         return $this->createOrEditAction(null, $request);
     }
 
@@ -76,21 +61,15 @@ class ApiController extends Controller
      * @Route("/api/v1/books/edit/{id}", name="api_edit", requirements={"id": "\d+"})
      * @Method("POST")
      */
-    public function editController($id, Request $request)
+    public function editController(int $id, Request $request)
     {
-        $apiKeyErrors = $this->checkApiKeyErrors($request);
-        if (!empty($apiKeyErrors)) {
-            return $this->jsonResponse('error', $apiKeyErrors, 403);
-        }
-
         return $this->createOrEditAction($id, $request);
     }
 
 
-    private function createOrEditAction($id, Request $request)
+    private function createOrEditAction(?int $id, Request $request)
     {
         $fields = $request->request->all();
-        $serializer = $this->container->get('jms_serializer');
         $em = $this->getDoctrine()->getManager();
         $requiredFields = ['title', 'author', 'readDate', 'isDownloadAllowed'];
         $errors = [];
@@ -102,15 +81,16 @@ class ApiController extends Controller
         }
 
         if (!empty($errors)) {
-            return $this->jsonResponse('error', $errors, 400);
+            return new JsonResponse(['success' => false, 'errors' => $errors], 400);
         }
 
         if (!$id) {
             $book = new Book();
+            $isNew = true;
         } else {
             $book = $em->find(Book::class, $id);
             if (!$book) {
-                return $this->jsonResponse('error', ['Book with id ' . $id . ' not found'], 404);
+                throw $this->createNotFoundException('The book does not exist');
             }
         }
 
@@ -123,44 +103,29 @@ class ApiController extends Controller
         $errors = $validator->validate($book);
 
         if ($errors->count()) {
-            return $this->jsonResponse('error', $errors, 400);
+            return new JsonResponse(['success' => false, 'errors' => $errors], 400);
         }
 
-        $em->persist($book);
+        if (!$id) {
+            $em->persist($book);
+        }
         $em->flush();
 
-        return $this->jsonResponse('ok', ['id' => $book->getId()], 200);
-    }
-
-
-    private function checkApiKeyErrors(Request $request)
-    {
-        if (!$request->query->has('apiKey')) {
-            return ['API key is missing'];
-        }
-
-        $userApiKey = $request->query->get('apiKey');
-        $apiKey = $this->container->getParameter('api_key');
-        if ($apiKey !== $userApiKey) {
-            return ['API key is incorrect'];
-        }
-
-        return null;
-    }
-
-    private function jsonResponse($status, $message, $statusCode)
-    {
-        $serializer = $this->container->get('jms_serializer');
-        return new Response(
-            $serializer->serialize(
-                [
-                    'status' => $status,
-                    'message' => $message
-                ],
-                'json'
-            ),
-            $statusCode,
-            ['Content-Type' => 'application/json']
+        return new JsonResponse(
+            ['success' => true, 'id' => $book->getId()],
+            $id ? 200 : 201
         );
+    }
+
+    private function getFileWebPath(?string $relativePath, Request $request) : ?string
+    {
+        //too many dependencies for event listener
+        if (!$relativePath) {
+            return null;
+        }
+
+        return $request->getSchemeAndHttpHost() .
+            $this->container->getParameter('upload_dir') .
+            $relativePath;
     }
 }

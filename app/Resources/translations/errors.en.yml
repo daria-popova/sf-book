@@ -1,0 +1,6 @@
+title.error404: Error 404. Page not found
+message.error404: The requested page page not found. Check URL or <a href="/">return to the homepage</a>.
+title.error403: Error 403. Access Denied
+message.error403: You don't have the permissions to access this page.
+title.error500: Internal error
+message.error500: Try to visit page later.

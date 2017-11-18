@@ -20,20 +20,22 @@ class Book
     private $id;
 
     /**
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank(message = "Field 'title' must be a non-empty string")
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Length(max="255")
      */
     private $title;
 
     /**
-     * @ORM\Column(type="string")
-     * @Assert\NotBlank(message = "Field 'author' must be a non-empty string")
+     * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank()
+     * @Assert\Length(max="255")
      */
     private $author;
 
     /**
      * @ORM\Column(type="date")
-     * @Assert\NotBlank(message = "Field 'readDate' must be a valid date. Format '2001-12-30'")
+     * @Assert\NotBlank()
      */
     private $readDate;
 
@@ -43,78 +45,78 @@ class Book
     private $isDownloadAllowed;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Assert\File(mimeTypes={ "image/jpeg", "image/png" })
+     * @ORM\Column(type="string", nullable=true, length=255)
+     * @Assert\Length(max="255")
      */
     private $cover;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
-     * @Assert\File(maxSize="5M")
+     * @ORM\Column(type="string", nullable=true, length=255)
+     * @Assert\Length(max="255")
      */
     private $source;
 
-    public function getId()
+    public function getId() : ?int
     {
         return $this->id;
     }
 
-    public function getTitle()
+    public function getTitle() : ?string
     {
         return $this->title;
     }
 
-    public function setTitle($title)
+    public function setTitle(string $title) : void
     {
         $this->title = $title;
     }
 
-    public function getAuthor()
+    public function getAuthor() : ?string
     {
         return $this->author;
     }
 
-    public function setAuthor($author)
+    public function setAuthor(string $author) : void
     {
         $this->author = $author;
     }
 
-    public function getReadDate()
+    public function getReadDate() : ?\DateTime
     {
         return $this->readDate;
     }
 
-    public function setReadDate($readDate)
+    public function setReadDate(\DateTime $readDate) : void
     {
         $this->readDate = $readDate;
     }
 
-    public function getIsDownloadAllowed()
+    public function getIsDownloadAllowed() : ?bool
     {
         return $this->isDownloadAllowed;
     }
 
-    public function setIsDownloadAllowed($isDownloadAllowed)
+    public function setIsDownloadAllowed(?bool $isDownloadAllowed) : void
     {
         $this->isDownloadAllowed = $isDownloadAllowed;
     }
 
-    public function getCover()
+    public function getCover() : ?string
     {
         return $this->cover;
     }
 
-    public function setCover($cover)
+    public function setCover(?string $cover) : void
     {
         $this->cover = $cover;
     }
 
-    public function getSource()
+    public function getSource() : ?string
     {
         return $this->source;
     }
 
-    public function setSource($source)
+    public function setSource(?string $source) : void
     {
         $this->source = $source;
     }

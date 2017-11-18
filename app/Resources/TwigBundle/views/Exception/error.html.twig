@@ -1,0 +1,5 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <h1>{{ 'title.error500'|trans([],'errors') }}</h1>
+    <p>{{ 'message.error500'|trans([],'errors')|raw }}</p>
+{% endblock %}

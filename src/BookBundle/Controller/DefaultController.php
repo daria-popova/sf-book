@@ -2,6 +2,7 @@
 
 namespace BookBundle\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\Date;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use BookBundle\Entity\Book;
 use BookBundle\Form\BookType;
 use BookBundle\Service\FileUploader;
@@ -26,11 +28,17 @@ class DefaultController extends Controller
             ->getDoctrine()
             ->getRepository(Book::class)
             ->findAllOrderedByDateDesc();
-        return $this->render('BookBundle:Default:list.html.twig', ['books' => $books]);
+
+        return $this->render(
+            'BookBundle:Default:list.html.twig',
+            [
+                'books' => $books,
+            ]
+        );
     }
 
     /**
-     * @Route("/book/create/", name="create")
+     * @Route("/book/create", name="create")
      */
     public function createAction(Request $request, FileUploader $fileUploader)
     {
@@ -40,12 +48,12 @@ class DefaultController extends Controller
     /**
      * @Route("/book/edit/{id}", name="edit", requirements={"id": "\d+"})
      */
-    public function editAction($id, Request $request, FileUploader $fileUploader)
+    public function editAction(int $id, Request $request, FileUploader $fileUploader)
     {
         return $this->createOrEditAction($id, $request, $fileUploader);
     }
 
-    private function createOrEditAction($id, Request $request, FileUploader $fileUploader)
+    private function createOrEditAction(?int $id, Request $request, FileUploader $fileUploader)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -54,30 +62,7 @@ class DefaultController extends Controller
         } else {
             $book = $em->find(Book::class, $id);
             if (!$book) {
-                return $this->render('BookBundle:Default:404.html.twig');
-            }
-        }
-
-        $oldFilePath = [
-            'cover' => $book->getCover(),
-            'source' => $book->getSource()
-        ];
-
-        if ($book->getCover()) {
-            $fullCoverPath = $fileUploader->getUploadDir() . '/' . $book->getCover();
-            if (is_file($fullCoverPath)) {
-                $book->setCover(new File($fullCoverPath, true));
-            } else {
-                $book->setCover(null);
-            }
-        }
-
-        if ($book->getSource()) {
-            $fullSourcePath = $fileUploader->getUploadDir() . '/' . $book->getSource();
-            if (is_file($fullSourcePath)) {
-                $book->setSource(new File($fullSourcePath, true));
-            } else {
-                $book->setSource(null);
+                throw $this->createNotFoundException('The book does not exist');
             }
         }
 
@@ -85,29 +70,30 @@ class DefaultController extends Controller
 
         $form->handleRequest($request);
 
+        //TODO how to check constraints of files?
+        //https://symfony.com/doc/2.0/book/forms.html#adding-validation
         if ($form->isSubmitted() && $form->isValid()) {
             $book = $form->getData();
 
-            $deleteCover = $form->has('deleteCover') && $form->get('deleteCover')->getData();
-            $deleteSource = $form->has('deleteSource') && $form->get('deleteSource')->getData();
-
-            if ($book->getCover() instanceof UploadedFile) {
-                $book->setCover($fileUploader->upload($book->getCover()));
-            } elseif ($deleteCover) {
+            if ($form->get('coverFile')->getData() instanceof UploadedFile) {
+                $book->setCover(
+                    $fileUploader->upload($form->get('coverFile')->getData())
+                );
+            } elseif ($form->has('deleteCover') && $form->get('deleteCover')->getData()) {
                 $book->setCover(null);
-            } else {
-                $book->setCover($oldFilePath['cover']);
             }
 
-            if ($book->getSource() instanceof UploadedFile) {
-                $book->setSource($fileUploader->upload($book->getSource()));
-            } elseif ($deleteSource) {
+            if ($form->get('sourceFile')->getData() instanceof UploadedFile) {
+                $book->setSource(
+                    $fileUploader->upload($form->get('sourceFile')->getData())
+                );
+            } elseif ($form->has('deleteSource') && $form->get('deleteSource')->getData()) {
                 $book->setSource(null);
-            } else {
-                $book->setSource($oldFilePath['source']);
             }
 
-            $em->persist($book);
+            if ($id === null) {
+                $em->persist($book);
+            }
             $em->flush();
             return $this->redirectToRoute('list');
         }
@@ -116,7 +102,6 @@ class DefaultController extends Controller
             'BookBundle:Default:edit.html.twig',
             [
                 'form' => $form->createView(),
-                'oldFilePath' => $oldFilePath,
                 'new' => !($book->getId())
             ]
         );
@@ -124,13 +109,19 @@ class DefaultController extends Controller
 
     /**
      * @Route("/book/delete/{id}", name="delete", requirements={"id": "\d+"})
+     * @Method("POST")
+     *
+     * TODO make correct json response in all cases, refactor js
      */
-    public function deleteAction($id)
+    public function deleteAction(int $id)
     {
         $em = $this->getDoctrine()->getManager();
         $book = $em->find(Book::class, $id);
+        if (!$book) {
+            throw $this->createNotFoundException('The book does not exist');
+        }
         $em->remove($book);
         $em->flush();
-        return $this->redirectToRoute('list');
+        return new JsonResponse(["status" => "ok"]);
     }
 }

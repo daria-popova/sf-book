@@ -4,6 +4,7 @@ book.download.link: Скачать
 book.edit.link: Редактировать
 book.delete.link: Удалить
 book.source.link: Ссылка на книгу
+delete.book.error.message: При удалении книги произошла ошибка
 form.title: Название
 form.author: Автор
 form.readDate: Дата прочтения

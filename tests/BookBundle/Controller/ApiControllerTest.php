@@ -46,12 +46,12 @@ class ApiControllerTest extends WebTestCase
         $this->assertEquals('403', $client->getResponse()->getStatusCode());
         $this->assertContains('API key is incorrect', $client->getResponse()->getContent());
 
-        $fields = array(
+        $fields = [
             'title' => 'test book',
             'author' => 'test author',
             'readDate' => '2011-05-11',
             'isDownloadAllowed' => false
-        );
+        ];
 
         $fieldsTest = $fields;
         unset($fieldsTest['title']);
@@ -82,12 +82,12 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $fields = array(
+        $fields = [
             'title' => 'test book ' . uniqid(),
             'author' => 'test author',
             'readDate' => '2011-05-11',
             'isDownloadAllowed' => false
-        );
+        ];
         $client->request('POST', '/api/v1/books/add?apiKey=' . $this->correctApiKey, $fields);
         $this->assertEquals('200', $client->getResponse()->getStatusCode());
         $this->assertContains('ok', $client->getResponse()->getContent());
@@ -115,7 +115,7 @@ class ApiControllerTest extends WebTestCase
         $em = $kernel->getContainer()->get('doctrine')->getManager();
         $book = $em->find(Book::class, $id);
         if ($book) {
-            $result = $em->remove($book);
+            $em->remove($book);
             $em->flush();
         }
     }

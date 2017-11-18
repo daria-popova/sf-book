@@ -38,14 +38,14 @@ class BookType extends AbstractType
                 ['required' => false, 'label' => 'form.isDownloadAllowed']
             )
             ->add(
-                'cover',
+                'coverFile',
                 FileType::class,
-                ['required' => false, 'label' => 'form.cover']
+                ['required' => false, 'mapped' => false, 'label' => 'form.cover']
             )
             ->add(
-                'source',
+                'sourceFile',
                 FileType::class,
-                ['required' => false, 'label' => 'form.source']
+                ['required' => false, 'mapped' => false, 'label' => 'form.source']
             )
             ->add(
                 'save',

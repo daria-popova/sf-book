@@ -9,19 +9,19 @@ class ClearCacheSubscriber implements EventSubscriber
 {
     private $cacheKeys;
 
-    public function __construct($cacheKeys)
+    public function __construct(array $cacheKeys)
     {
-        $this->cacheKeys = $cacheKeys ?: [];
+        $this->cacheKeys = $cacheKeys;
     }
 
     public function getSubscribedEvents()
     {
-        return array(
+        return [
             'postFlush',
-        );
+        ];
     }
 
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush(PostFlushEventArgs $args) : void
     {
         foreach ($this->cacheKeys as $key) {
             $args
