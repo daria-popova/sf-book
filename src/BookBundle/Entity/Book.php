@@ -36,11 +36,13 @@ class Book
     /**
      * @ORM\Column(type="date")
      * @Assert\NotBlank()
+     * @Assert\DateTime()
      */
     private $readDate;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Assert\NotNull()
      */
     private $isDownloadAllowed;
 
@@ -66,7 +68,7 @@ class Book
         return $this->title;
     }
 
-    public function setTitle(string $title) : void
+    public function setTitle(?string $title) : void
     {
         $this->title = $title;
     }
@@ -76,7 +78,7 @@ class Book
         return $this->author;
     }
 
-    public function setAuthor(string $author) : void
+    public function setAuthor(?string $author) : void
     {
         $this->author = $author;
     }
@@ -86,7 +88,7 @@ class Book
         return $this->readDate;
     }
 
-    public function setReadDate(\DateTime $readDate) : void
+    public function setReadDate($readDate) : void
     {
         $this->readDate = $readDate;
     }

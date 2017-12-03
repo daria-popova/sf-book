@@ -13,7 +13,8 @@ class ApiRequestFormatSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST => 'onRequest',
+            // must be registered after the default Locale listener
+            KernelEvents::REQUEST => array(array('onRequest', 10)),
         ];
     }
 
@@ -23,6 +24,7 @@ class ApiRequestFormatSubscriber implements EventSubscriberInterface
 
         if (substr($request->getPathInfo(), 0, 4) == '/api') {
             $request->setRequestFormat('json');
+            $request->setLocale('en');
         }
     }
 }

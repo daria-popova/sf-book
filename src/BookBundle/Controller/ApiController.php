@@ -2,6 +2,9 @@
 
 namespace BookBundle\Controller;
 
+use BookBundle\Controller\ApiModel\BookListResponse;
+use BookBundle\Controller\ApiModel\EditSuccessResponse;
+use BookBundle\Controller\ApiModel\ErrorResponse;
 use Doctrine\ORM\EntityNotFoundException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -9,9 +12,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Constraints\Date;
 use Doctrine\ORM\EntityManagerInterface;
 use BookBundle\Entity\Book;
+use Symfony\Component\Validator\Tests\Fixtures\ConstraintAValidator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ApiController extends Controller implements TokenAuthenticatedController
 {
@@ -42,9 +49,9 @@ class ApiController extends Controller implements TokenAuthenticatedController
             }
         }
 
-        $jsonContent = $serializer->serialize($books, 'json');
+        $jsonContent = $serializer->serialize(new BookListResponse($books), 'json');
 
-        return JsonResponse::fromJsonString($jsonContent, 200);
+        return JsonResponse::fromJsonString($jsonContent);
     }
 
     /**
@@ -71,39 +78,30 @@ class ApiController extends Controller implements TokenAuthenticatedController
     {
         $fields = $request->request->all();
         $em = $this->getDoctrine()->getManager();
-        $requiredFields = ['title', 'author', 'readDate', 'isDownloadAllowed'];
-        $errors = [];
-
-        foreach ($requiredFields as $requiredField) {
-            if (!isset($fields[$requiredField]) || is_null($fields[$requiredField])) {
-                $errors[] = 'Field \'' . $requiredField . '\' is required';
-            }
-        }
-
-        if (!empty($errors)) {
-            return new JsonResponse(['success' => false, 'errors' => $errors], 400);
-        }
 
         if (!$id) {
             $book = new Book();
-            $isNew = true;
         } else {
             $book = $em->find(Book::class, $id);
             if (!$book) {
-                throw $this->createNotFoundException('The book does not exist');
+                return new JsonResponse(new ErrorResponse(['Book not found']), 404);
             }
         }
 
-        $book->setTitle($fields["title"]);
-        $book->setAuthor($fields["author"]);
-        $book->setReadDate(\DateTime::createFromFormat('Y-m-d', $fields["readDate"]));
-        $book->setIsDownloadAllowed($fields["isDownloadAllowed"]);
+        $book->setTitle($fields["title"] ?? null);
+        $book->setAuthor($fields["author"] ?? null);
+        $readDate = $fields["readDate"] ?? null;
+        if ($readDate) {
+            $readDate = \DateTime::createFromFormat('Y-m-d', $fields["readDate"]);
+        }
+        $book->setReadDate($readDate);
+        $book->setIsDownloadAllowed($fields["isDownloadAllowed"] ?? null);
 
         $validator = $this->get('validator');
         $errors = $validator->validate($book);
 
         if ($errors->count()) {
-            return new JsonResponse(['success' => false, 'errors' => $errors], 400);
+            return new JsonResponse(new ErrorResponse($errors), 400);
         }
 
         if (!$id) {
@@ -112,7 +110,7 @@ class ApiController extends Controller implements TokenAuthenticatedController
         $em->flush();
 
         return new JsonResponse(
-            ['success' => true, 'id' => $book->getId()],
+            new EditSuccessResponse($book->getId()),
             $id ? 200 : 201
         );
     }
